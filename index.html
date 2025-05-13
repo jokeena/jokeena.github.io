@@ -126,7 +126,7 @@ input {
 
 
 <header style="width: 50%;">
-<h1>Axis and Allies Combat Calculator</h1>
+<h1>Axis & Allies Combat Calculator</h1>
 </header>
 
 <table id="topHeading">
@@ -1308,9 +1308,15 @@ const rowRTD = tbodyB.insertRow();
 addHeader("", "", "Remaining", "Troops","", "", rowRTA, "yes");
 addHeader("", "", "Remaining", "Troops","", "", rowRTD, "yes");
 
-addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
+if (selectedOption == "Militaristic") {
+  addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
+  addCellsLoop("Total:", bombDefSize,infDefSize, artDefSize, tankDefSize, fightDefSize, tbodyB);
+}
 
-addCellsLoop("Total:", infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize, tbodyB);
+if(selectedOption == "Economical") {
+  addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
+  addCellsLoop("Total:", infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize, tbodyB);
+}
 
 const rowHA = tbodyA.insertRow();
 const rowHD = tbodyB.insertRow();
