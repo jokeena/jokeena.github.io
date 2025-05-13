@@ -1292,12 +1292,12 @@ addHeader("", "", "Total", "Casualties", "", "", roangA, "yes");
 
 addHeader("", "", "Total", "Casualties", "", "", roangB, "yes");
 
-if (selectedOption == "Militaristic") {
+if (selectedOption == "MilitaristicLand") {
   addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
   addCellsLoop("Total:", bombDefCas, infDefCas, artDefCas, tankDefCas, fightDefCas, tbodyB);
 }
 
-if(selectedOption == "Economical") {
+if(selectedOption == "EconomicalLand") {
   addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
   addCellsLoop("Total:", infDefCas, artDefCas, tankDefCas, fightDefCas, bombDefCas, tbodyB);
 }
@@ -1308,12 +1308,12 @@ const rowRTD = tbodyB.insertRow();
 addHeader("", "", "Remaining", "Troops","", "", rowRTA, "yes");
 addHeader("", "", "Remaining", "Troops","", "", rowRTD, "yes");
 
-if (selectedOption == "Militaristic") {
+if (selectedOption == "MilitaristicLand") {
   addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
   addCellsLoop("Total:", bombDefSize,infDefSize, artDefSize, tankDefSize, fightDefSize, tbodyB);
 }
 
-if(selectedOption == "Economical") {
+if(selectedOption == "EconomicalLand") {
   addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
   addCellsLoop("Total:", infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize, tbodyB);
 }
