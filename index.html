@@ -1292,10 +1292,15 @@ addHeader("", "", "Total", "Casualties", "", "", roangA, "yes");
 
 addHeader("", "", "Total", "Casualties", "", "", roangB, "yes");
 
+if (selectedOption == "Militaristic") {
+  addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
+  addCellsLoop("Total:", bombDefCas, infDefCas, artDefCas, tankDefCas, fightDefCas, tbodyB);
+}
 
-addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
-
-addCellsLoop("Total:", infDefCas, artDefCas, tankDefCas, fightDefCas, bombDefCas, tbodyB);
+if(selectedOption == "Economical") {
+  addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
+  addCellsLoop("Total:", infDefCas, artDefCas, tankDefCas, fightDefCas, bombDefCas, tbodyB);
+}
 	
 const rowRTA = tbodyA.insertRow();
 const rowRTD = tbodyB.insertRow();
