@@ -1,1556 +1,586 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-table { 
-	border: 1px solid black;
-	border-collapse: collapse;
-	margin: 5px 0;
-	font-size: 0.9em;
-	font-family: sans-serif;
-	min-width: 400px;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>John Keena — games &amp; tools</title>
+  <meta name="description" content="John Keena builds tools for the games he plays in real life — an Axis & Allies combat calculator, a cribbage board, and Clarke Solitaire.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+  <meta property="og:title" content="John Keena — games &amp; tools">
+  <meta property="og:description" content="Tools for the games I play in real life.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #faf9f7;
+      --surface: #f3f1ec;
+      --text: #1c1b1a;
+      --muted: #6f6c66;
+      --faint: #a3a09a;
+      --border: #e7e4de;
+      --accent: #b0532e;
+      --card-red: #bf3a30;
+      --card-black: #26241f;
+    }
 
-table thead tr {
-	background-color: #4AA8FC;
-	color: #000000;
-	text-align: center;
-}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-table thead tr.active-row th {
-	font-weight: bold;
-    	background-color: #89CFF0;
-    	color: #000000;
-    	text-align: center;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
 
-table th, td {
-	padding: 12px 15px;
-	text-align: center;
-}
+    ::selection { background: #e9ddd2; }
 
-table tbody tr {
-    border-bottom: 1px solid;
-    background-color: #C6F6F3;
-    text-align: center;
-}
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
 
-table tbody tr.active-row {
-    font-weight: bold;
-    background-color: #89CFF0;
-    color: #000000;
-    text-align: center;
-}
+    a { color: inherit; }
 
-header h1 {
-  font-size: 30px;
-  font-weight: 600;
-  color: #2a3e51;
-  font-family: "Georgia", serif;
-  text-shadow: 2px 2px 4px #ccc;
-  padding: 10px;
-  background-color: #d9ceae;
-  border: 1px solid #34526f;
-  border-radius: 5px;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  width: 530px;
-}
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
 
+    /* ---------- Header ---------- */
 
-.comment-container {
+    header {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      height: 150px;
-      
+      padding: 30px 0;
     }
 
-.comment-box {
-      border: 1px solid #ccc;
-      padding: 10px;
-      width: 900px;
-      height: 340px;
-      resize: none;
-      overflow: auto;
-      font-family: "Old Standard TT", serif;
-      font-size: 18px;
-      background-color: #f3efe5;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      line-height: 1.5;
-      color: #584f3a;
+    header nav { display: flex; gap: 26px; }
+
+    header nav a {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
     }
 
-.comment-box p {
-      margin: 0 0 10px;
+    header nav a:hover { color: var(--text); }
+
+    /* ---------- Hero ---------- */
+
+    .hero {
+      padding: 88px 0 96px;
+      position: relative;
     }
 
-.hidden {
-      display: none;
+    /* pegboard dots, fading out toward the edges */
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #d6d2c8 1.3px, transparent 1.4px);
+      background-size: 26px 26px;
+      -webkit-mask-image: radial-gradient(460px 300px at 82% 42%, rgba(0, 0, 0, 0.75), transparent 72%);
+      mask-image: radial-gradient(460px 300px at 82% 42%, rgba(0, 0, 0, 0.75), transparent 72%);
+      pointer-events: none;
     }
 
-body {
-background-color: #e6dbbf;
-}
+    .hero > * { position: relative; }
 
-button {
-	border: 1px solid black;
-	border-collapse: collapse;
-	margin: 5px 0;
-	font-size: 15px;
-	font-family: sans-serif;
-	min-width: 100px;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-	background-color: #C6F6F3;
-}
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
 
-input { 
-    text-align: center; 
-}
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+    }
 
-#casualtyBarChart {
-    position: fixed;
-    top: 10px;
-    right: 50px; 
-    width: 800px;
-    height: 600px;
-  }
+    .bio {
+      color: var(--muted);
+      max-width: 58ch;
+      margin-top: 26px;
+      font-size: 1.02rem;
+    }
 
-</style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css?family=Old+Standard+TT&display=swap" rel="stylesheet">
+    /* ---------- Projects ---------- */
+
+    .section-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 28px;
+    }
+
+    .projects-list { padding-bottom: 40px; }
+
+    .project {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 44px;
+      padding: 52px 0;
+      border-top: 1px solid var(--border);
+      align-items: center;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    h2 a { text-decoration: none; }
+    h2 a:hover { color: var(--accent); }
+
+    .meta {
+      font-size: 0.8rem;
+      color: var(--faint);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin: 6px 0 14px;
+    }
+
+    .project p { color: var(--muted); font-size: 0.98rem; }
+
+    .project-links {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
+      font-size: 0.93rem;
+      font-weight: 500;
+    }
+
+    .project-links a {
+      text-decoration: none;
+      color: var(--text);
+      border-bottom: 1px solid var(--faint);
+      padding-bottom: 1px;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .project-links a:hover { color: var(--accent); border-color: var(--accent); }
+    .project-links .src { color: var(--muted); }
+
+    /* ---------- Art panels ---------- */
+
+    .art {
+      aspect-ratio: 3 / 2;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ---------- Art: infantryman ---------- */
+
+    .art-aa svg { height: 88%; }
+
+    /* ---------- Art: cribbage ---------- */
+
+    .art-crib { flex-direction: column; gap: 0; }
+
+    .crib-board {
+      background: linear-gradient(160deg, #dcc39c, #c5a67c);
+      border: 1px solid #b3946b;
+      border-radius: 10px;
+      padding: 13px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 3px 10px rgba(90, 66, 34, 0.18);
+      transform: rotate(-2deg) translateY(-6px);
+    }
+
+    .crib-row { display: flex; gap: 14px; }
+
+    .crib-grp { display: flex; gap: 7px; }
+
+    .hole {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #7a5c38;
+      box-shadow: inset 0 1px 1.5px rgba(35, 22, 8, 0.75);
+      position: relative;
+    }
+
+    .hole.pegged::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      box-shadow: 0 1px 2px rgba(35, 22, 8, 0.45);
+    }
+
+    .hole.peg-red::after { background: radial-gradient(circle at 35% 30%, #e8756a, #a02318); }
+    .hole.peg-blue::after { background: radial-gradient(circle at 35% 30%, #6f96e0, #24479c); }
+
+    /* ---------- Playing cards (shared) ---------- */
+
+    .mcard {
+      width: 44px;
+      height: 62px;
+      background: #fff;
+      border: 1px solid #d8d4cc;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(40, 35, 25, 0.16);
+      position: relative;
+      font-family: "Inter", sans-serif;
+    }
+
+    .mcard::before {
+      content: attr(data-rank) "\A" attr(data-suit);
+      white-space: pre;
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.05;
+    }
+
+    .mcard::after {
+      content: attr(data-suit);
+      position: absolute;
+      right: 5px;
+      bottom: 2px;
+      font-size: 17px;
+    }
+
+    .mcard.red::before, .mcard.red::after { color: var(--card-red); }
+    .mcard.black::before, .mcard.black::after { color: var(--card-black); }
+
+    /* the 29 hand, fanned */
+    .fan {
+      display: flex;
+      justify-content: center;
+      margin-top: -10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fan .mcard {
+      margin: 0 -9px;
+      transform-origin: 50% 130%;
+      transform: rotate(var(--r));
+    }
+
+    /* ---------- Art: solitaire tableau ---------- */
+
+    .tableau {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transform: translateY(4px);
+    }
+
+    .tcol { display: flex; flex-direction: column; }
+
+    .tcol .mcard + .mcard { margin-top: -46px; }
+
+    .mcard.back {
+      background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 3px, transparent 3px 7px),
+        linear-gradient(160deg, #5e7291, #45566f);
+      border-color: #fff;
+      border-width: 3px;
+      box-shadow: 0 2px 5px rgba(40, 35, 25, 0.16), inset 0 0 0 1px #d8d4cc;
+    }
+
+    /* ---------- Footer ---------- */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 34px 0 52px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      color: var(--faint);
+      font-size: 0.88rem;
+    }
+
+    footer nav { display: flex; gap: 22px; }
+
+    footer a {
+      text-decoration: none;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    /* ---------- Responsive ---------- */
+
+    @media (max-width: 720px) {
+      .hero { padding: 56px 0 64px; }
+      .project {
+        grid-template-columns: 1fr;
+        gap: 26px;
+        padding: 40px 0;
+      }
+      .art { max-width: 400px; }
+      header nav { gap: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
 </head>
 <body>
 
+  <div class="wrap">
 
-<header style="width: 50%;">
-<h1>Axis & Allies Combat Calculator</h1>
-</header>
+    <header>
+      <nav>
+        <a href="https://github.com/jokeena" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/john-keena/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <a href="mailto:jokeena@umich.edu">jokeena@umich.edu</a>
+      </nav>
+    </header>
 
-<table id="topHeading">
-<thead>
-<tr>
-<th> <label for="Battle"> Battle Type: </label>
-<select name="Battle" id= "battle">
-<option value="Blank"></option>
-<option value="Sea">Sea</option>
-<option value="Land">Land</option>
-</select>
-</th>
-</tr>
-</thead>
-</table>
+    <section class="hero">
+      <p class="eyebrow">Software Developer &middot; Madison, WI</p>
+      <h1>John Keena</h1>
+      <p class="bio">
+        Software developer at Epic Systems in Madison, Wisconsin. University of Michigan &rsquo;26,
+        computer science and economics. I like card games and board games, and have developed some
+        projects to enhance my experience playing them.
+      </p>
+    </section>
 
-<div class="comment-container" id ="commentHeader">
-  <div id="commentBox" class="comment-box" contenteditable="false">
-    <p>This calculator will help you predict the outcome of land and sea battles in Axis and Allies.
-    I adopted the rules from Axis and Allies Europe (specifically hit values and troop costs).</p>
-    <p> See <a href="https://fgbradleys.com/rules//Axis%20and%20Allies%20Pacific.pdf" target="_blank">page 9</a></p>
-    
-    <p>When calculating, you have the option to choose a 'Militaristic'
-    or 'Economical' combat style. 'Militaristic' prioritizes winning at all costs. For example, defending bombers will 
-    be sacrificed first in land battles, and attacking aircraft carriers will be sacrificed second in sea battles, despite both having high IPC values
-    . 'Economical' prioritizes minimizing IPC loss. For instance, defending bombers 
-    will be sacrificed last in land battles despite shooting at the lowest value. The Economical strategy is not
-    always successful, specifically when your side loses the advantage because of the decision to not 
-    sacrifice lower hitting pieces.</p> 
-    
-    <p>This calculator will model all of this, including expected chance of victory, troop loss by round,
-    remaining pieces, and IPC loss. It is helpful to calculate both 'Militaristic' and 'Economical' to see which battle
-    strategy is best </p>
-  
+    <section class="projects-list">
+      <span class="section-label">Projects</span>
+
+      <article class="project">
+        <div class="art art-aa" aria-hidden="true">
+          <svg viewBox="0 0 240 230" role="img">
+            <defs>
+              <linearGradient id="plastic" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#6f924f"/>
+                <stop offset="1" stop-color="#4c6b36"/>
+              </linearGradient>
+              <linearGradient id="plasticDark" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#526f3b"/>
+                <stop offset="1" stop-color="#40592e"/>
+              </linearGradient>
+            </defs>
+
+            <!-- ground shadow -->
+            <ellipse cx="122" cy="211" rx="80" ry="10" fill="rgba(35, 30, 20, 0.10)"/>
+
+            <!-- base slab -->
+            <rect x="62" y="196" width="120" height="10" fill="url(#plasticDark)"/>
+            <ellipse cx="122" cy="206" rx="60" ry="10" fill="url(#plasticDark)"/>
+            <ellipse cx="122" cy="196" rx="60" ry="10" fill="url(#plastic)"/>
+
+            <!-- ===== figure: standing firing, profile right ===== -->
+
+            <!-- legs (curved, tapered feel) -->
+            <g fill="none" stroke="url(#plastic)" stroke-linecap="round">
+              <path d="M114,126 C107,144 99,164 95,182" stroke-width="17"/>
+              <path d="M124,126 C132,144 138,164 140,182" stroke-width="17"/>
+            </g>
+
+            <!-- boots with toes and heels -->
+            <g fill="url(#plastic)">
+              <path d="M85,180 L104,180 L105,190 C110,190 114,192 116,195 C117,197 115,198 112,198 L89,198 C85,198 84,195 84,191 Z"/>
+              <path d="M131,180 L150,180 L151,190 C156,190 160,192 162,195 C163,197 161,198 158,198 L135,198 C131,198 130,195 130,191 Z"/>
+            </g>
+
+            <!-- torso: waisted jacket, leaning into the shot -->
+            <path d="M106,132 C105,116 110,100 119,88 C126,84 138,86 143,92 C139,106 137,118 137,130 C137,138 128,141 121,141 C113,141 107,139 106,132 Z" fill="url(#plastic)"/>
+
+            <!-- jacket hem + belt (molded shading) -->
+            <path d="M108,127 C118,131 128,131 136,127" fill="none" stroke="rgba(30,45,18,0.35)" stroke-width="2"/>
+            <path d="M107,120 C117,124 127,124 136,120" fill="none" stroke="rgba(30,45,18,0.45)" stroke-width="4"/>
+
+            <!-- trouser creases -->
+            <g fill="none" stroke="rgba(30,45,18,0.28)" stroke-width="2" stroke-linecap="round">
+              <path d="M109,142 C104,154 100,166 98,175"/>
+              <path d="M128,144 C132,156 136,166 138,175"/>
+            </g>
+
+            <!-- rifle: stock, receiver, barrel, sight, trigger guard, sling -->
+            <path d="M97,79 C94,79 92,84 93,90 C94,95 98,97 103,96 L121,91 L121,78 Z" fill="url(#plastic)"/>
+            <g fill="none" stroke="url(#plastic)" stroke-linecap="round">
+              <path d="M120,84 L170,79" stroke-width="8"/>
+              <path d="M170,79 L206,75" stroke-width="4.5"/>
+            </g>
+            <rect x="200" y="68" width="2.5" height="6" rx="1" fill="url(#plastic)"/>
+            <path d="M133,89 a5,5 0 0 0 9,1" fill="none" stroke="url(#plastic)" stroke-width="2.5"/>
+            <path d="M112,92 C130,110 150,106 166,86" fill="none" stroke="url(#plastic)" stroke-width="2.5"/>
+
+            <!-- arms: rear bent to trigger, front extended to forestock -->
+            <g fill="none" stroke="url(#plastic)" stroke-linecap="round">
+              <path d="M122,96 C124,106 130,112 138,108 C144,104 146,97 147,91" stroke-width="12"/>
+              <path d="M129,92 C141,97 153,94 163,87" stroke-width="11"/>
+            </g>
+            <g fill="url(#plastic)">
+              <circle cx="147" cy="87" r="6"/>
+              <circle cx="165" cy="83" r="6"/>
+            </g>
+
+            <!-- head: cheek on the stock, nose, chin strap -->
+            <g fill="url(#plastic)">
+              <circle cx="133" cy="68" r="9.5"/>
+              <path d="M141,64 C145,64 147,67 146,70 C144,72 141,71 140,69 Z"/>
+            </g>
+            <path d="M127,74 C130,78 136,79 140,75" fill="none" stroke="rgba(30,45,18,0.4)" stroke-width="1.5"/>
+
+            <!-- M1 helmet with brim -->
+            <path d="M117,62 C116,50 124,42 134,42 C144,42 152,50 151,60 L157,64 C158,67 154,69 150,68 L122,69 C117,69 114,66 117,62 Z" fill="url(#plastic)"/>
+
+            <!-- molded-plastic sheen -->
+            <g fill="none" stroke-linecap="round">
+              <path d="M124,50 C128,45 136,43 142,46" stroke="rgba(255,255,255,0.38)" stroke-width="2.5"/>
+              <path d="M115,124 L121,96" stroke="rgba(255,255,255,0.15)" stroke-width="6"/>
+              <path d="M172,77 L200,74" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>
+              <path d="M74,192 C88,196 108,198 124,197" stroke="rgba(255,255,255,0.16)" stroke-width="3"/>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <h2><a href="https://jokeena.github.io/axis-allies-calculator/" target="_blank" rel="noopener">Axis &amp; Allies Combat Calculator</a></h2>
+          <p class="meta">TypeScript &middot; Svelte &middot; Monte Carlo</p>
+          <p>
+            Combat-odds simulator for Axis &amp; Allies Europe. Enter both sides&rsquo; units and
+            get win probabilities, round-by-round expected casualties, and the IPC cost of the
+            fight. Handles land, naval, and amphibious battles.
+          </p>
+          <div class="project-links">
+            <a href="https://jokeena.github.io/axis-allies-calculator/" target="_blank" rel="noopener">Launch &nearr;</a>
+            <a class="src" href="https://github.com/jokeena/axis-allies-calculator" target="_blank" rel="noopener">Source</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project">
+        <div class="art art-crib" aria-hidden="true">
+          <div class="crib-board">
+            <div class="crib-row">
+              <div class="crib-grp">
+                <span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span>
+              </div>
+              <div class="crib-grp">
+                <span class="hole"></span><span class="hole"></span><span class="hole pegged peg-red"></span><span class="hole"></span><span class="hole"></span>
+              </div>
+            </div>
+            <div class="crib-row">
+              <div class="crib-grp">
+                <span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole pegged peg-blue"></span><span class="hole"></span>
+              </div>
+              <div class="crib-grp">
+                <span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span>
+              </div>
+            </div>
+            <div class="crib-row">
+              <div class="crib-grp">
+                <span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span>
+              </div>
+              <div class="crib-grp">
+                <span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span>
+              </div>
+            </div>
+          </div>
+          <!-- the perfect 29 hand -->
+          <div class="fan">
+            <span class="mcard black" data-rank="J" data-suit="&spades;" style="--r:-16deg"></span>
+            <span class="mcard red"   data-rank="5" data-suit="&diams;"  style="--r:-8deg"></span>
+            <span class="mcard black" data-rank="5" data-suit="&spades;" style="--r:0deg"></span>
+            <span class="mcard red"   data-rank="5" data-suit="&hearts;" style="--r:8deg"></span>
+            <span class="mcard black" data-rank="5" data-suit="&clubs;"  style="--r:16deg"></span>
+          </div>
+        </div>
+        <div>
+          <h2><a href="https://jokeena.github.io/cribbage-board/" target="_blank" rel="noopener">Cribbage Board</a></h2>
+          <p class="meta">HTML &middot; JavaScript &middot; 2&ndash;3 players</p>
+          <p>
+            A digital board for physical cards. Pegging with undo, a hand counter, and a discard
+            optimizer that shows the expected value of every possible throw. For when you want to
+            play cribbage, but don&rsquo;t have a board.
+          </p>
+          <div class="project-links">
+            <a href="https://jokeena.github.io/cribbage-board/" target="_blank" rel="noopener">Launch &nearr;</a>
+            <a class="src" href="https://github.com/jokeena/cribbage-board" target="_blank" rel="noopener">Source</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project">
+        <div class="art art-sol" aria-hidden="true">
+          <div class="tableau">
+            <div class="tcol">
+              <span class="mcard black" data-rank="A" data-suit="&spades;"></span>
+            </div>
+            <div class="tcol">
+              <span class="mcard back"></span>
+              <span class="mcard red" data-rank="6" data-suit="&hearts;"></span>
+            </div>
+            <div class="tcol">
+              <span class="mcard back"></span>
+              <span class="mcard back"></span>
+              <span class="mcard black" data-rank="7" data-suit="&clubs;"></span>
+            </div>
+            <div class="tcol">
+              <span class="mcard back"></span>
+              <span class="mcard back"></span>
+              <span class="mcard back"></span>
+              <span class="mcard red" data-rank="Q" data-suit="&diams;"></span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2><a href="https://jokeena.github.io/clarke-solitaire/" target="_blank" rel="noopener">Clarke Solitaire</a></h2>
+          <p class="meta">JavaScript &middot; House rules</p>
+          <p>
+            A custom take on solitaire, played entirely in the browser. Seven columns, four
+            foundations, and cards that find their own way home when you click them.
+          </p>
+          <div class="project-links">
+            <a href="https://jokeena.github.io/clarke-solitaire/" target="_blank" rel="noopener">Launch &nearr;</a>
+            <a class="src" href="https://github.com/jokeena/clarke-solitaire" target="_blank" rel="noopener">Source</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <span>&copy; 2026 John Keena</span>
+      <nav>
+        <a href="https://github.com/jokeena" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/john-keena/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:jokeena@umich.edu">jokeena@umich.edu</a>
+      </nav>
+    </footer>
+
   </div>
-</div>
-
-
-<table id="landTable" style="display:none">
-<thead>
-<tr>
-<th></th>
-<th>Attack Piece Quantities</th>
-<th>Defense Piece Quantities</th>
-</tr>
-</thead>
-<tbody>
-
-<tr>
-<th>Infantry:</th>
-<th><label for="offInfCount"></label>
-<input type="text" id="offInfCountL" name = "offInfCountL"style="width: 50px;" value= "0"></th>
-<th><label for="defInfCount"></label>
-<input type="text" id="defInfCountL" name = "defInfCountL"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Artillery:</th>
-<th><label for="offArtCount"></label>
-<input type="text" id="offArtCountL" name = "offArtCountL"style="width: 50px;" value= "0"></th>
-<th><label for="defInfCount"></label>
-<input type="text" id="defArtCountL" name = "defArtCountL"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Tanks:</th>
-<th><label for="offTankCount"></label>
-<input type="text" id="offTankCountL" name = "offTankCountL"style="width: 50px;" value= "0"></th>
-<th><label for="defInfCount"></label>
-<input type="text" id="defTankCountL" name = "defTankCountL"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Fighters:</th>
-<th><label for="offFightCount"></label>
-<input type="text" id="offFightCountL" name = "offFightCountL"style="width: 50px;" value= "0"></th>
-<th><label for="defInfCount"></label>
-<input type="text" id="defFightCountL" name = "defFightCountL"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Bombers:</th>
-<th><label for="offBombCount"></label>
-<input type="text" id="offBombCountL" name = "offBombCountL"style="width: 50px;" value= "0"></th>
-<th><label for="defInfCount"></label>
-<input type="text" id="defBombCountL" name = "defBombCountL"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Anti Aircraft:</th>
-<th>Input 0 or 1</th>
-<th><label for="defInfCount"></label>
-<input type="text" id="defAACountL" name = "defAACountL"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th> <label for="combatStyleLand"> Combat Style: </label></th>
-<th><select name="combatStyleLand" id="combatStyleLand" style="width: 100px;>
-<option value="blankLand">Blank</option>
-<option value="MilitaristicLand">Militaristic</option>
-<option value="EconomicalLand">Economical</option>
-</select></th>
-<th></th>
-</tr>
-
-<thead>
-<tr>
-<th></th>
-<th><button id="reset"> Reset </button></th>
-<th><button id="calcLandButton"> Calculate </button></th>
-
-</tr>
-</thead>
-
-</tbody>
-</table>
-
-
-<table id="seaTable" style="display:none">
-<tr>
-<thead>
-<th></th>
-<th>Attack Piece Quantities</th>
-<th>Defense Piece Quantities</th>
-</tr>
-</thead>
-<tbody>
-
-
-<tr>
-<th>Transports:</th>
-<th><label for="offTransCount"></label>
-<input type="text" id="offTransCountS" name = "offTransCountS"style="width: 50px;" value= "0"></th>
-<th><label for="defTransCount"></label>
-<input type="text" id="defTransCountS" name = "defTransCountS"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Submarines:</th>
-<th><label for="offSubCount"></label>
-<input type="text" id="offSubCountS" name = "offSubCountS"style="width: 50px;" value= "0"></th>
-<th><label for="defSubCount"></label>
-<input type="text" id="defSubCountS" name = "defSubCountS"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Destroyers:</th>
-<th><label for="offDestCount"></label>
-<input type="text" id="offDestCountS" name = "offDestCountS"style="width: 50px;" value= "0"></th>
-<th><label for="defDestCount"></label>
-<input type="text" id="defDestCountS" name = "defDestCountS"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Battleships:</th>
-<th><label for="offBattCount"></label>
-<input type="text" id="offBattCountS" name = "offBattCountS"style="width: 50px;" value= "0"></th>
-<th><label for="defBattCount"></label>
-<input type="text" id="defBattCountS" name = "defBattCountS"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Aircraft Carriers:</th>
-<th><label for="offAirCCount"></label>
-<input type="text" id="offAirCCountS" name = "offAirCCountS"style="width: 50px;" value= "0"></th>
-<th><label for="defAirCCount"></label>
-<input type="text" id="defAirCCountS" name = "defAirCCountS"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Fighters:</th>
-<th><label for="offFightCountD"></label>
-<input type="text" id="offFightCountS" name = "offFightCountS"style="width: 50px;" value= "0"></th>
-<th><label for="defFightCountD"></label>
-<input type="text" id="defFightCountS" name = "defFightCountS"style="width: 50px;" value= "0"></th>
-</tr>
-
-<tr>
-<th>Bombers:</th>
-<th><label for="offBombCountD"></label>
-<input type="text" id="offBombCountS" name = "offBombCountS"style="width: 50px;" value= "0"></th>
-<th></th>
-</tr>
-
-<tr>
-<th> <label for="combatStyleSea"> Combat Style: </label></th>
-<th><select name="combatStyleSea" id="combatStyleSea" style="width: 100px;>
-<option value="blankSea">Blank</option>
-<option value="MilitaristicSea">Militaristic</option>
-<option value="EconomicalSea">Economical</option>
-</select></th>
-<th></th>
-</tr>
-
-<thead>
-<tr>
-<th></th>
-<th><button id="resetSea"> Reset </button></th>
-<th><button id="calcSeaButton"> Calculate </button></th>
-
-</tr>
-</thead>
-
-</tbody>
-
-</table>
-
-
-
-<table id="calculateLandTable" style="display:none">
-
-<thead>
-<th>Chance of Winning: </th>
-<th> </th>
-<th> </th>
-
-</thead>
-
-<tbody>
-
-<th>Attack Pieces: <label for="attPieces"></label>
-<input type="text" id="attPieces" name = "attPieces"style="width: 30px;" readonly></th>
-
-<th>Defense Pieces: <label for="defPieces"></label>
-<input type="text" id="defPieces" name = "defPieces"style="width: 30px;" readonly></th>
-
-
-<th>Tie: <label for="tiePieces"></label>
-<input type="text" id="tiePieces" name = "tiePieces"style="width: 30px;" readonly></th>
-</tbody>
-
-</table>
-
-
-<table id="calculateSeaTable" style="display:none">
-
-<thead>
-<th>Chance of Winning: </th>
-<th> </th>
-<th> </th>
-
-</thead>
-
-<tbody>
-
-<th>Attack Pieces: <label for="attSeaPieces"></label>
-<input type="text" id="attSeaPieces" name = "attSeaPieces"style="width: 30px;" readonly></th>
-
-<th>Defense Pieces: <label for="defSeaPieces"></label>
-<input type="text" id="defSeaPieces" name = "defSeaPieces"style="width: 30px;" readonly></th>
-
-
-<th>Tie: <label for="tieSeaPieces"></label>
-<input type="text" id="tieSeaPieces" name = "tieSeaPieces"style="width: 30px;" readonly></th>
-</tbody>
-
-</table>
-
-
-
-<table id="casAttLandTable" style="display:none">
-<thead><tr><th></th><th></th><th>Attacker </th><th>Casualties</th><th></th><th></th></tr></thead>
-
-<tbody>
-</tbody>
-
-</table>
-
-
-<table id="casDefLandTable"style="display:none" >
-<thead><tr><th></th><th></th><th>Defender </th><th>Casualties</th><th></th><th></th></tr></thead>
-
-<tbody>
-</tbody>
-
-</table>
-
-
-<table id="casAttSeaTable" style="display:none">
-<thead><tr><th></th><th></th><th></th><th>Attacker </th><th>Casualties</th><th></th><th></th><th></th></tr></thead>
-
-<tbody>
-</tbody>
-
-</table>
-
-
-<table id="casDefSeaTable" style="display:none">
-<thead><tr><th></th><th></th><th></th><th>Defender </th><th>Casualties</th><th></th><th></th></tr></thead>
-
-<tbody>
-</tbody>
-
-</table>
-
-<canvas id="casualtyBarChart"></canvas>
-
-<script>
-const dropdown = document.getElementById("battle");
-const seaTable = document.getElementById("seaTable");
-const landTable = document.getElementById("landTable");
-const calculateSeaTable = document.getElementById("calculateSeaTable");
-const calculateLandTable = document.getElementById("calculateLandTable");
-const casAttLandTable = document.getElementById("casAttLandTable");
-const casDefLandTable = document.getElementById("casDefLandTable");
-const casAttSeaTable = document.getElementById("casAttSeaTable");
-const casDefSeaTable = document.getElementById("casDefSeaTable");
-var commentBox = document.getElementById("commentBox");
-var commentHeader = document.getElementById("commentHeader");
-
-
-dropdown.addEventListener("change", function() {
-  const selectedOption = dropdown.value;
-
-commentBox.style.display = "none";
-commentHeader.style.display = "none";
-
-  if (selectedOption === "Sea") {
-    seaTable.style.display = "table";
-    landTable.style.display = "none";
-    calculateLandTable.style.display = "none";
-    calculateSeaTable.style.display = "table";
-    casAttLandTable.style.display = "none";
-    casDefLandTable.style.display = "none";
-    casAttSeaTable.style.display = "table";
-    casDefSeaTable.style.display = "table";
-
-  }
-  else if (selectedOption === "Land") {
-    landTable.style.display = "table";
-    seaTable.style.display = "none";
-    calculateLandTable.style.display = "table";
-    calculateSeaTable.style.display = "none";
-    casAttLandTable.style.display = "table";
-    casDefLandTable.style.display = "table";
-    casAttSeaTable.style.display = "none";
-    casDefSeaTable.style.display = "none";
-  }
-  else {
-    landTable.style.display = "none";
-    seaTable.style.display = "none";
-    calculateLandTable.style.display = "none";
-    calculateSeaTable.style.display = "none";
-    casAttLandTable.style.display = "none";
-    casDefLandTable.style.display = "none";
-    casAttSeaTable.style.display = "none";
-    casDefSeaTable.style.display = "none";
-  }
-});
-
-function countAttLandHits(is, as, ts, fs, bs) {
-if (as >= is) {
-as += is;
-is = 0;
-}
-
-else {
-temp = is - as;
-as += (is - temp);
-is = temp;
-}
-return ((is * 1/6) + (as * 1/3) + (ts * 1/2) + (fs * 1/2) + (bs * 2/3));
-}
-
-function countDefLandHits(is, as, ts, fs, bs) {
-	return ((is * 1/3) + (as * 1/3) + (ts * 1/3) + (fs * 2/3) + (bs * 1/6));
-}
-
-function zeroOrHero (size) {
-if (size % 1 == 0) {
-	return size;
- }
-else {
-	return size.toFixed(2);
- }
-}
-
-function countAttSeaHits(sS, dS, aS, bsS, fS, bS) {
-	return ((sS * 1/3) + (dS * 1/2) + (aS * 1/6) + (bsS * 2/3) + (fS * 1/2) + (bS * 2/3));
-}
-
-function countDefSeaHits(tS, sS, dS, aS, bsS, fS) {
-	return ((tS * 1/6) + (sS * 1/3) + (dS * 1/2) + (aS * 1/2) + (bsS * 2/3) + (fS * 2/3));
-}
-
-function addCellsLoop (tot, iS, aS, tS, fS, bS, targetBody) {
-	let data = [tot, zeroOrHero(iS), zeroOrHero(aS), zeroOrHero(tS), zeroOrHero(fS), zeroOrHero(bS)];
-
-const rowI = targetBody.insertRow();
-  
-for (let i = 0; i < data.length; i++) {
-  const cellI = rowI.insertCell();
-  cellI.textContent = data[i];
-  }
-}
-
-let dataSea;
-
-function addCellsSeaLoop (tot, tS, sS, dS, aS, bsS, fS, bS, targetBody) {
-if (bS == "no") {
-dataSea = [tot, zeroOrHero(tS), zeroOrHero(sS), zeroOrHero(dS), zeroOrHero(aS), zeroOrHero(bsS), zeroOrHero(fS)];
-}
-
-else {
-dataSea = [tot, zeroOrHero(tS), zeroOrHero(sS), zeroOrHero(dS), zeroOrHero(aS), zeroOrHero(bsS), zeroOrHero(fS), zeroOrHero(bS)];
-}
-
-const rowI = targetBody.insertRow();
-  
-for (let i = 0; i < dataSea.length; i++) {
-  const cellI = rowI.insertCell();
-  cellI.textContent = dataSea[i];
-  }
-}
-
-function resetA (input) {
-	document.getElementById(input).value = 0;
-}
-
-const resetButton = document.getElementById("reset");
-resetButton.addEventListener('click', function() {
-
-resetA("offInfCountL"); resetA("offArtCountL"); resetA("offTankCountL"); resetA("offFightCountL"); resetA("offBombCountL");
-
-resetA("defInfCountL"); resetA("defArtCountL"); resetA("defTankCountL"); resetA("defFightCountL"); resetA("defBombCountL"); resetA("defAACountL");
-
-});
-
-const resetSeaButton = document.getElementById("resetSea");
-resetSeaButton.addEventListener('click', function() {
-
-resetA("offTransCountS"); resetA("offSubCountS"); resetA("offDestCountS"); resetA("offAirCCountS"); resetA("offBattCountS"); resetA("offFightCountS"); resetA("offBombCountS");
-
-resetA("defTransCountS"); resetA("defSubCountS"); resetA("defDestCountS"); resetA("defAirCCountS"); resetA("defBattCountS"); resetA("defFightCountS"); resetA("defBombCountS");
-
-});
-
-
-function parseA (input) {
-	return parseInt(document.getElementById(input).value);
-}
-
-function iFirst (troopC, troopS, aOdHits, row, landaOd) {
-troopC += troopS;
-aOdHits -= troopS;
-if (row == "sim" || row == "battSim") {}
-
-else {
- if (troopS % 1 == 0) {
- const cellIn = row.insertCell();
- cellIn.textContent = troopS;
- }
-
- else {
- const cellIn = row.insertCell();
- cellIn.textContent = troopS.toFixed(2);
- }
-}
-
-if (row == "battSim") {}
-
-else {
-landaOd -= troopS;
-}
-
-troopS = 0;
-
-return [troopC, troopS, aOdHits, landaOd];
-}
-
-function iSecond (troopC, troopS, aOdHits, row, landaOd) {
-troopC += aOdHits;
-troopS -= aOdHits;
-if (row == "battSim") {}
-
-else {
-landaOd -= aOdHits;
-}
-
-if (row == "sim" || row == "battSim") {}
-
-else {
- if (aOdHits % 1 == 0) {
- const cellIn = row.insertCell();
- cellIn.textContent = aOdHits;
- }
-
- else {
- const cellIn = row.insertCell();
- cellIn.textContent = aOdHits.toFixed(2);
- }
-}
-
-aOdHits = 0;
-	
-return [troopC, troopS, aOdHits, landaOd];
-}
-
-function iThird (troopC, troopS, aOdHits, row, landaOd) {
-if (row == "sim" || row == "battSim") {
-	return [troopC, troopS, aOdHits, landaOd];
-}
-
-else {
-const cellIn = row.insertCell();
-cellIn.textContent = 0;
-
-return [troopC, troopS, aOdHits, landaOd];
-}
-}
-
-function battleSim(troopC, troopS, aOdHits, row, aOdSize) {
-if (aOdHits >= troopS && troopS > 0) {
-	return iFirst(troopC, troopS, aOdHits, row, aOdSize);
-}
-else if (aOdHits > 0 && troopS > 0) {
-	return iSecond(troopC, troopS, aOdHits, row, aOdSize);
-}
-else {
-	return iThird(troopC, troopS, aOdHits, row, aOdSize);
-}
-}
-
-function addHeader(input1, input2, input3, input4, input5, input6, row, main) {
-let data = [input1, input2, input3, input4, input5, input6];
-
-for (let i = 0; i < data.length; i++) {
-  const cellI = row.insertCell();
-  cellI.textContent = data[i];
-}
-
-if (main == "yes") {
-	row.classList.add('active-row');
- }
-}
-
-function addSeaHeader(input1, input2, input3, input4, input5, input6, input7, input8, row, main) {
-let data = [input1, input2, input3, input4, input5, input6, input7];
-
-for (let i = 0; i < data.length; i++) {
-  const cellI = row.insertCell();
-  cellI.textContent = data[i];
-}
-
-if (input8 == "no") {}
-
-else {
-  const cellIn8 = row.insertCell();
-  cellIn8.textContent = input8;
-}
-
-if (main == "yes") {
-	row.classList.add('active-row');
- }
-}
-
-function findIPCLoss (iC, aC, tC, fC, bC) {
-	return ((iC * 3) + (aC * 4) + (tC * 5) + (fC * 12) + (bC * 15));
-}
-
-function findIPCSeaLoss (tC, sC, dC, aC, bsC, fC, bC) {
-	return ((tC * 8) + (sC * 8) + (dC * 12) + (aC * 18) + (bsC * 24) + (fC * 12) + (bC * 15));
-}
-
-
-function diceHits (troop, troopSize) {
-
-var hitValue;
-var numHits = 0;
-
-if (troop == "attInf" || troop == "defBomb") {
-	hitValue = 1;
-}
-if (troop == "attArt" || troop == "defArt" || troop == "defTank" || troop == "defInf") {
-	hitValue = 2;
-}
-if (troop == "defFight" || troop == "attBomb") {
-	hitValue = 4;
-}
-
-if (troop == "attTank" || troop == "attFight") {
-	hitValue = 3;
-}
-
-for (let i = 0; i < troopSize; i++) {
-	if ((Math.floor(Math.random() * 6) + 1) <= hitValue) {
-		numHits += 1;
-	}
-}
-
-return numHits;
-}
-
-function diceSeaHits (troop, troopSize) {
-var hitValue;
-var numHits = 0;
-
-if (troop == "attTrans") {
-	hitValue = 0;
-}
-
-if (troop == "attCarr" || troop == "defTrans") {
-	hitValue = 1;
-}
-if (troop == "attSub" || troop == "defSub") {
-	hitValue = 2;
-}
-if (troop == "defFight" || troop == "attBomb" || troop == "defBatt" || troop == "attBatt") {
-	hitValue = 4;
-}
-
-if (troop == "defCarr" || troop == "attFight" || troop == "defDest" || troop == "attDest") {
-	hitValue = 3;
-}
-
-for (let i = 0; i < troopSize; i++) {
-	if ((Math.floor(Math.random() * 6) + 1) <= hitValue) {
-		numHits += 1;
-	}
-}
-
-return numHits;
-}
-
-function winPercentageSimulator (aArmySize, dArmySize, infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize, aaDefSize) {
-
-var attackWins = 0;
-var defenseWins = 0;
-var ties = 0;
-
-
-var aArmySizeTemp; var dArmySizeTemp;
-
-var infAttCasW; var artAttCasW; var tankAttCasW; var fightAttCasW; var bombAttCasW;
-
-var infDefCasW; var artDefCasW; var tankDefCasW; var fightDefCasW; var bombDefCasW;
-
-var infDefTemp; var artDefTemp; var tankDefTemp; var fightDefTemp; var bombDefTemp;
-
-var infAttTemp; var artAttTemp; var tankAttTemp; var fightAttTemp; var bombAttTemp;
-
-var tempArtSize; var tempInfSize;
-
-var i = 0;
-
-while (i < 10000) {
-aArmySizeTemp = aArmySize; dArmySizeTemp = dArmySize;
-
-infAttCasW = 0; artAttCasW = 0; tankAttCasW = 0; fightAttCasW = 0; bombAttCasW = 0;
-
-infDefCasW = 0; artDefCasW = 0; tankDefCasW = 0; fightDefCasW = 0; bombDefCasW = 0;
-
-infDefTemp = infDefSize; artDefTemp = artDefSize; tankDefTemp = tankDefSize; fightDefTemp = fightDefSize; bombDefTemp = bombDefSize;
-
-infAttTemp = infAttSize; artAttTemp = artAttSize; tankAttTemp = tankAttSize; fightAttTemp = fightAttSize; bombAttTemp = bombAttSize;
-
-
-var rounds = bombAttTemp + fightAttTemp;
-
-if (aaDefSize > 0) {
-
-while (rounds > 0) {
-if ((Math.floor(Math.random() * 6) + 1) == 1) {
-
-if (fightAttTemp > 0) {
-	fightAttTemp -= 1;
-	aArmySizeTemp -=1;
-	fightAttCasW += 1;
-}
-else {
-	bombAttTemp -= 1;
-	aArmySizeTemp -=1;
-	bombAttCasW += 1;
-}
-}
-rounds -= 1;
-}
- 
-}
-
-while (aArmySizeTemp > 0 && dArmySizeTemp > 0) {
-var temp = 0;
-
-if (artAttTemp >= infAttTemp) {
-tempArtSize = artAttTemp + infAttTemp;
-tempInfSize = 0;
-}
-
-else {
-tempInfSize = infAttTemp - artAttTemp;
-tempArtSize = artAttTemp * 2;
-}
-
-var attHits = diceHits("attInf", tempInfSize) + diceHits("attArt", tempArtSize) + diceHits("attTank", tankAttTemp) + diceHits("attFight", fightAttTemp) + diceHits("attBomb", bombAttTemp);
-
-var defHits = diceHits("defInf", infDefTemp) + diceHits("defArt", artDefTemp) + diceHits("defTank", tankDefTemp) + diceHits("defFight", fightDefTemp) + diceHits("defBomb", bombDefTemp);
-
-const dropdownLand = document.getElementById("combatStyleLand"); 
-const selectedOption = dropdownLand.value;
-
-if (selectedOption == "MilitaristicLand") {
-
-[bombDefCasW, bombDefTemp, attHits, dArmySizeTemp] = battleSim(bombDefCasW, bombDefTemp, attHits, "sim", dArmySizeTemp);
-
-[infDefCasW, infDefTemp, attHits, dArmySizeTemp] = battleSim(infDefCasW, infDefTemp, attHits, "sim", dArmySizeTemp);
-
-[artDefCasW, artDefTemp, attHits, dArmySizeTemp] = battleSim(artDefCasW, artDefTemp, attHits, "sim", dArmySizeTemp);
-
-[tankDefCasW, tankDefTemp, attHits, dArmySizeTemp] = battleSim(tankDefCasW, tankDefTemp, attHits, "sim", dArmySizeTemp);
-
-[fightDefCasW, fightDefTemp, attHits, dArmySizeTemp] = battleSim(fightDefCasW, fightDefTemp, attHits, "sim", dArmySizeTemp);
-
-
-[infAttCasW, infAttTemp, defHits, aArmySizeTemp] = battleSim(infAttCasW, infAttTemp, defHits, "sim", aArmySizeTemp);
-
-[artAttCasW, artAttTemp, defHits, aArmySizeTemp] = battleSim(artAttCasW, artAttTemp, defHits, "sim", aArmySizeTemp);
-
-[tankAttCasW, tankAttTemp, defHits, aArmySizeTemp] = battleSim(tankAttCasW, tankAttTemp, defHits, "sim", aArmySizeTemp);
-
-[fightAttCasW, fightAttTemp, defHits, aArmySizeTemp] = battleSim(fightAttCasW, fightAttTemp, defHits, "sim", aArmySizeTemp);
-
-[bombAttCasW, bombAttTemp, defHits, aArmySizeTemp] = battleSim(bombAttCasW, bombAttTemp, defHits, "sim", aArmySizeTemp);
-
-}
-
-if (selectedOption == "EconomicalLand") {
-
-[infDefCasW, infDefTemp, attHits, dArmySizeTemp] = battleSim(infDefCasW, infDefTemp, attHits, "sim", dArmySizeTemp);
-
-[artDefCasW, artDefTemp, attHits, dArmySizeTemp] = battleSim(artDefCasW, artDefTemp, attHits, "sim", dArmySizeTemp);
-
-[tankDefCasW, tankDefTemp, attHits, dArmySizeTemp] = battleSim(tankDefCasW, tankDefTemp, attHits, "sim", dArmySizeTemp);
-
-[fightDefCasW, fightDefTemp, attHits, dArmySizeTemp] = battleSim(fightDefCasW, fightDefTemp, attHits, "sim", dArmySizeTemp);
-
-[bombDefCasW, bombDefTemp, attHits, dArmySizeTemp] = battleSim(bombDefCasW, bombDefTemp, attHits, "sim", dArmySizeTemp);
-
-
-[infAttCasW, infAttTemp, defHits, aArmySizeTemp] = battleSim(infAttCasW, infAttTemp, defHits, "sim", aArmySizeTemp);
-
-[artAttCasW, artAttTemp, defHits, aArmySizeTemp] = battleSim(artAttCasW, artAttTemp, defHits, "sim", aArmySizeTemp);
-
-[tankAttCasW, tankAttTemp, defHits, aArmySizeTemp] = battleSim(tankAttCasW, tankAttTemp, defHits, "sim", aArmySizeTemp);
-
-[fightAttCasW, fightAttTemp, defHits, aArmySizeTemp] = battleSim(fightAttCasW, fightAttTemp, defHits, "sim", aArmySizeTemp);
-
-[bombAttCasW, bombAttTemp, defHits, aArmySizeTemp] = battleSim(bombAttCasW, bombAttTemp, defHits, "sim", aArmySizeTemp);
-
- }
-}
-
-if (aArmySizeTemp > 0) {
-	attackWins += 1;
-}
-else if (dArmySizeTemp > 0) {
-	defenseWins += 1;
-}
-else {
-	ties +=1;
-}
-
-i += 1;
-}
-
-var attackWinPercentage = attackWins / 100; 
-var defenseWinPercentage = defenseWins / 100; 
-var tiePercentage = ties / 100; 
-
-document.getElementById("attPieces").value = attackWinPercentage;
-document.getElementById("defPieces").value = defenseWinPercentage;
-document.getElementById("tiePieces").value = tiePercentage;
-
-}
-
-function winPercentageSeaSimulator (aArmySize, dArmySize, transAttSize, subAttSize, destAttSize, airCAttSize, battAttSize, fightAttSeaSize, bombAttSeaSize, transDefSize, subDefSize, destDefSize, airCDefSize, battDefSize, fightDefSeaSize) {
-
-var attackWins = 0;
-var defenseWins = 0;
-var ties = 0;
-
-var aArmySizeTemp; var dArmySizeTemp;
-
-var transAttCasW; var subAttCasW; var destAttCasW; var airCAttCasW; var battAttCasW; var fightAttCasW; var bombAttCasW; var battSubAttCasW;
-
-var transDefCasW; var subDefCasW; var destDefCasW; var airCDefCasW; var battDefCasW; var fightDefCasW; var battSubDefCasW;
-
-var transAttTemp; var subAttTemp; var destAttTemp; var airCAttTemp; var battAttTemp; var fightAttTemp; var bombAttTemp; var battSubAttTemp;
-
-var transDefTemp; var subDefTemp; var destDefTemp; var airCDefTemp; var battDefTemp; var fightDefTemp; var battSubDefTemp;
-
-var i = 0;
-
-while (i < 10000) {
-aArmySizeTemp = aArmySize; dArmySizeTemp = dArmySize;
-
-transAttCasW = 0; subAttCasW = 0; destAttCasW = 0; airCAttCasW = 0; battAttCasW = 0; fightAttCasW = 0; bombAttCasW = 0; battSubAttCasW = 0;
-
-transDefCasW = 0; subDefCasW = 0; destDefCasW = 0; airCDefCasW = 0; battDefCasW = 0; fightDefCasW = 0; battSubDefCasW = 0;
-
-transAttTemp = transAttSize; subAttTemp = subAttSize; destAttTemp = destAttSize; airCAttTemp = airCAttSize; battAttTemp = battAttSize; fightAttTemp = fightAttSeaSize; 
-bombAttTemp = bombAttSeaSize; battSubAttTemp = battAttSize;
-
-transDefTemp = transDefSize; subDefTemp = subDefSize; destDefTemp = destDefSize; airCDefTemp = airCDefSize; battDefTemp = battDefSize; fightDefTemp = fightDefSeaSize; 
-battSubDefTemp = battDefSize;
-
-
-while (aArmySizeTemp > 0 && dArmySizeTemp > 0) {
-var temp = 0;
-
-var attHits = diceSeaHits("attTrans", transAttTemp) + diceSeaHits("attSub", subAttTemp) + diceSeaHits("attDest", destAttTemp) + diceSeaHits("attCarr", airCAttTemp) + diceSeaHits("attBatt", battAttTemp) + diceSeaHits("attFight", fightAttTemp) + diceSeaHits("attBomb", bombAttTemp);
-
-var defHits = diceSeaHits("defTrans", transDefTemp) + diceSeaHits("defSub", subDefTemp) + diceSeaHits("defDest", destDefTemp) + diceSeaHits("defCarr", airCDefTemp) + diceSeaHits("defBatt", battDefTemp) + diceSeaHits("defFight", fightDefTemp);
-
-const dropdownSea = document.getElementById("combatStyleSea"); 
-const selectedOption = dropdownSea.value;
-
-if (selectedOption == "MilitaristicSea") {
-
-[battSubDefCasW, battSubDefTemp, attHits, dArmySizeTemp] = battleSim(battSubDefCasW, battSubDefTemp, attHits, "battSim", dArmySizeTemp);
-
-[transDefCasW, transDefTemp, attHits, dArmySizeTemp] = battleSim(transDefCasW, transDefTemp, attHits, "sim", dArmySizeTemp);
-
-[subDefCasW, subDefTemp, attHits, dArmySizeTemp] = battleSim(subDefCasW, subDefTemp, attHits, "sim", dArmySizeTemp);
-
-[destDefCasW, destDefTemp, attHits, dArmySizeTemp] = battleSim(destDefCasW, destDefTemp, attHits, "sim", dArmySizeTemp);
-
-[airCDefCasW, airCDefTemp, attHits, dArmySizeTemp] = battleSim(airCDefCasW, airCDefTemp, attHits, "sim", dArmySizeTemp);
-
-[fightDefCasW, fightDefTemp, attHits, dArmySizeTemp] = battleSim(fightDefCasW, fightDefTemp, attHits, "sim", dArmySizeTemp);
-
-[battDefCasW, battDefTemp, attHits, dArmySizeTemp] = battleSim(battDefCasW, battDefTemp, attHits, "sim", dArmySizeTemp);
-
-
-[battSubAttCasW, battSubAttTemp, defHits, aArmySizeTemp] = battleSim(battSubAttCasW, battSubAttTemp, defHits, "battSim", aArmySizeTemp);
-
-[transAttCasW, transAttTemp, defHits, aArmySizeTemp] = battleSim(transAttCasW, transAttTemp, defHits, "sim", aArmySizeTemp);
-
-[airCAttCasW, airCAttTemp, defHits, aArmySizeTemp] = battleSim(airCAttCasW, airCAttTemp, defHits, "sim", aArmySizeTemp);
-
-[subAttCasW, subAttTemp, defHits, aArmySizeTemp] = battleSim(subAttCasW, subAttTemp, defHits, "sim", aArmySizeTemp);
-
-[fightAttCasW, fightAttTemp, defHits, aArmySizeTemp] = battleSim(fightAttCasW, fightAttTemp, defHits, "sim", aArmySizeTemp);
-
-[destAttCasW, destAttTemp, defHits, aArmySizeTemp] = battleSim(destAttCasW, destAttTemp, defHits, "sim", aArmySizeTemp);
-
-[bombAttCasW, bombAttTemp, defHits, aArmySizeTemp] = battleSim(bombAttCasW, bombAttTemp, defHits, "sim", aArmySizeTemp);
-
-[battAttCasW, battAttTemp, defHits, aArmySizeTemp] = battleSim(battAttCasW, battAttTemp, defHits, "sim", aArmySizeTemp);
-
-}
-
-if (selectedOption == "EconomicalSea") {
-
-[battSubDefCasW, battSubDefTemp, attHits, dArmySizeTemp] = battleSim(battSubDefCasW, battSubDefTemp, attHits, "battSim", dArmySizeTemp);
-
-[transDefCasW, transDefTemp, attHits, dArmySizeTemp] = battleSim(transDefCasW, transDefTemp, attHits, "sim", dArmySizeTemp);
-
-[subDefCasW, subDefTemp, attHits, dArmySizeTemp] = battleSim(subDefCasW, subDefTemp, attHits, "sim", dArmySizeTemp);
-
-[destDefCasW, destDefTemp, attHits, dArmySizeTemp] = battleSim(destDefCasW, destDefTemp, attHits, "sim", dArmySizeTemp);
-
-[fightDefCasW, fightDefTemp, attHits, dArmySizeTemp] = battleSim(fightDefCasW, fightDefTemp, attHits, "sim", dArmySizeTemp);
-
-[airCDefCasW, airCDefTemp, attHits, dArmySizeTemp] = battleSim(airCDefCasW, airCDefTemp, attHits, "sim", dArmySizeTemp);
-
-[battDefCasW, battDefTemp, attHits, dArmySizeTemp] = battleSim(battDefCasW, battDefTemp, attHits, "sim", dArmySizeTemp);
-
-
-[battSubAttCasW, battSubAttTemp, defHits, aArmySizeTemp] = battleSim(battSubAttCasW, battSubAttTemp, defHits, "battSim", aArmySizeTemp);
-
-[transAttCasW, transAttTemp, defHits, aArmySizeTemp] = battleSim(transAttCasW, transAttTemp, defHits, "sim", aArmySizeTemp);
-
-[subAttCasW, subAttTemp, defHits, aArmySizeTemp] = battleSim(subAttCasW, subAttTemp, defHits, "sim", aArmySizeTemp);
-
-[fightAttCasW, fightAttTemp, defHits, aArmySizeTemp] = battleSim(fightAttCasW, fightAttTemp, defHits, "sim", aArmySizeTemp);
-
-[destAttCasW, destAttTemp, defHits, aArmySizeTemp] = battleSim(destAttCasW, destAttTemp, defHits, "sim", aArmySizeTemp);
-
-[bombAttCasW, bombAttTemp, defHits, aArmySizeTemp] = battleSim(bombAttCasW, bombAttTemp, defHits, "sim", aArmySizeTemp);
-
-[airCAttCasW, airCAttTemp, defHits, aArmySizeTemp] = battleSim(airCAttCasW, airCAttTemp, defHits, "sim", aArmySizeTemp);
-
-[battAttCasW, battAttTemp, defHits, aArmySizeTemp] = battleSim(battAttCasW, battAttTemp, defHits, "sim", aArmySizeTemp);
-
- }
-}
-
-if (aArmySizeTemp > 0) {
-	attackWins += 1;
-}
-else if (dArmySizeTemp > 0) {
-	defenseWins += 1;
-}
-else {
-	ties +=1;
-}
-
-i += 1;
-}
-
-var attackWinPercentage = attackWins / 100; 
-var defenseWinPercentage = defenseWins / 100; 
-var tiePercentage = ties / 100; 
-
-document.getElementById("attSeaPieces").value = attackWinPercentage;
-document.getElementById("defSeaPieces").value = defenseWinPercentage;
-document.getElementById("tieSeaPieces").value = tiePercentage;
-}
-
-var infAttCas; var artAttCas; var tankAttCas; var fightAttCas; var bombAttCas;
-
-var infDefCas; var artDefCas; var tankDefCas; var fightDefCas; var bombDefCas;
-
-var transAttCas; var subAttCas; var destAttCas; var airCAttCas; var battAttCas; var fightAttSeaCas; var bombAttSeaCas; var battAttSubCas;
-
-var transDefCas; var subDefCas; var destDefCas; var airCDefCas; var battDefCas; var fightDefSeaCas; var battDefSubCas;
-
-var totalAttCasualties; var totalDefCasualties;
-
-var totalAttSeaCasualties; var totalDefSeaCasualties;
-
-let barChart;
-let xValues;
-let defenderCasualties;
-let attackerCasualties;
-
-function generateChart(type) {
-  if (barChart) {
-    barChart.destroy();
-  }
- 
-if (type == "land") {
-
-  xValues = ['Infantry', 'Artillery', 'Tanks', 'Fighters', 'Bombers', 'Total'];
-  defenderCasualties = [infDefCas, artDefCas, tankDefCas, fightDefCas, bombDefCas, totalDefCasualties];
-  attackerCasualties = [infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, totalAttCasualties];
-
-}
-
-else {
-  xValues = ['Transports', 'Subs', 'Destroyers', 'A. Carriers', 'Battleships', 'Fighters', 'Bombers', 'Total'];
-  defenderCasualties = [transDefCas, subDefCas, destDefCas, airCDefCas, battDefCas, fightDefSeaCas, 0, totalDefSeaCasualties];
-  attackerCasualties = [transAttCas, subAttCas, destAttCas, airCAttCas, battAttCas, fightAttSeaCas, bombAttSeaCas, totalAttSeaCasualties];
-}
-
-  const canvas = document.getElementById('casualtyBarChart');
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  canvas.width = 640;
-  canvas.height = 480;
-
-  barChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: xValues,
-      datasets: [
-        {
-          label: 'Defender Casualties',
-          data: defenderCasualties,
-          backgroundColor: 'rgba(75, 192, 192)',
-          borderColor: 'rgba(75, 192, 192)',
-          borderWidth: 1
-        },
-        {
-          label: 'Attacker Casualties',
-          data: attackerCasualties,
-          backgroundColor: 'rgba(255, 99, 132)',
-          borderColor: 'rgba(255, 99, 132)',
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-      responsive: false,
-      maintainAspectRatio: true, 
-      scales: {
-        x: {
-          display: true,
-          title: {
-            display: true,
-            text: 'Troops'
-          }
-        },
-        y: {
-          display: true,
-          title: {
-            display: true,
-            text: 'Casualties'
-          }
-        }
-      }
-    }
-  });
-}
-
-window.addEventListener('load', function() {
-const calcLandButton = document.getElementById('calcLandButton');
-
-calcLandButton.addEventListener('click', function() {
-var infAttSize = parseA("offInfCountL"); 
-var artAttSize = parseA("offArtCountL"); 
-var tankAttSize = parseA("offTankCountL"); 
-var fightAttSize = parseA("offFightCountL"); 
-var bombAttSize = parseA("offBombCountL");
-
-var infDefSize = parseA("defInfCountL"); 
-var artDefSize = parseA("defArtCountL"); 
-var tankDefSize = parseA("defTankCountL");
-var fightDefSize = parseA("defFightCountL"); 
-var bombDefSize = parseA("defBombCountL"); 
-var aaDefSize = parseA("defAACountL");
-
-var attackLandSize = infAttSize + artAttSize + tankAttSize + fightAttSize + bombAttSize;
-var defenseLandSize = infDefSize + artDefSize + tankDefSize + fightDefSize + bombDefSize;
-
-infAttCas = 0; artAttCas = 0; tankAttCas = 0; fightAttCas = 0; bombAttCas = 0;
-
-infDefCas = 0; artDefCas = 0; tankDefCas = 0; fightDefCas = 0; bombDefCas = 0;
-
-var round = 1;
-
-var attHits;
-var defHits;
-
-const tableA = document.getElementById('casAttLandTable');
-const tableB = document.getElementById('casDefLandTable');
-
-let tbodyA = tableA.getElementsByTagName('tbody')[0];
-if (tbodyA) {
-    tbodyA.remove();
-}
-
-let tbodyB = tableB.getElementsByTagName('tbody')[0];
-if (tbodyB) {
-    tbodyB.remove();
-}
-
-tbodyA = document.createElement('tbody');
-tbodyB = document.createElement('tbody');
-
-tableA.appendChild(tbodyA);
-tableB.appendChild(tbodyB);
-
-const rowBA = tbodyA.insertRow();
-const rowBD = tbodyB.insertRow();
-
-const dropdownLand = document.getElementById("combatStyleLand"); 
-const selectedOption = dropdownLand.value;
-
-if (selectedOption == "EconomicalLand") {
-addHeader("Round", "Infantry", "Artillery", "Tanks", "Fighters", "Bombers", rowBA, "yes");
-addHeader("Round", "Infantry", "Artillery", "Tanks", "Fighters", "Bombers", rowBD, "yes");
-}
-
-if (selectedOption == "MilitaristicLand") {
-addHeader("Round", "Infantry", "Artillery", "Tanks", "Fighters", "Bombers", rowBA, "yes");
-addHeader("Round", "Bombers", "Infantry", "Artillery", "Tanks", "Fighters", rowBD, "yes");
-}
-
-winPercentageSimulator (attackLandSize, defenseLandSize, infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize, aaDefSize);
-
-var aaPower;
-
-if (aaDefSize > 0 && (fightAttSize > 0 || bombAttSize > 0)) {
-  aaPower = (1/6) * (fightAttSize + bombAttSize);
-  if (aaPower > fightAttSize) {
-	bombAttSize -= (aaPower - fightAttSize);
-	fightAttCas += fightAttSize;
-	bombAttCas += (aaPower - fightAttSize);
-	fightAttSize = 0;
-	attackLandSize -= (fightAttCas + bombAttCas);
-
-	addCellsLoop(0, 0, 0, 0, fightAttCas, bombAttCas, tbodyA);
-  }
-  else {
-	fightAttSize -= aaPower;
-	fightAttCas += aaPower;
-	attackLandSize -= aaPower;
-	
-	addCellsLoop(0, 0, 0, 0, fightAttCas, 0, tbodyA);
-  }
-}
-
-while (attackLandSize > 0 && defenseLandSize > 0) {
-
-if (round == 10 || (attackLandSize < 0.01 || defenseLandSize < 0.01)) {
-	break;
-}
-    attHits = countAttLandHits(infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize); 
-    defHits = countDefLandHits(infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize);
-
-const rowA = tbodyA.insertRow();
-const rowB = tbodyB.insertRow();
-
-const cell1A = rowA.insertCell();
-cell1A.textContent = round;
-
-const cell1B = rowB.insertCell();
-cell1B.textContent = round;
-
-if (selectedOption == "MilitaristicLand") {
-
-
-[bombDefCas, bombDefSize, attHits, defenseLandSize] = battleSim(bombDefCas, bombDefSize, attHits, rowB, defenseLandSize);
-
-[infDefCas, infDefSize, attHits, defenseLandSize] = battleSim(infDefCas, infDefSize, attHits, rowB, defenseLandSize);
-
-[artDefCas, artDefSize, attHits, defenseLandSize] = battleSim(artDefCas, artDefSize, attHits, rowB, defenseLandSize);
-
-[tankDefCas, tankDefSize, attHits, defenseLandSize] = battleSim(tankDefCas, tankDefSize, attHits, rowB, defenseLandSize);
-
-[fightDefCas, fightDefSize, attHits, defenseLandSize] = battleSim(fightDefCas, fightDefSize, attHits, rowB, defenseLandSize);
-
-
-[infAttCas, infAttSize, defHits, attackLandSize] = battleSim(infAttCas, infAttSize, defHits, rowA, attackLandSize);
-
-[artAttCas, artAttSize, defHits, attackLandSize] = battleSim(artAttCas, artAttSize, defHits, rowA, attackLandSize);
-
-[tankAttCas, tankAttSize, defHits, attackLandSize] = battleSim(tankAttCas, tankAttSize, defHits, rowA, attackLandSize);
-
-[fightAttCas, fightAttSize, defHits, attackLandSize] = battleSim(fightAttCas, fightAttSize, defHits, rowA, attackLandSize);
-
-[bombAttCas, bombAttSize, defHits, attackLandSize] = battleSim(bombAttCas, bombAttSize, defHits, rowA, attackLandSize);
-
-}
-
-if (selectedOption == "EconomicalLand") {
-
-[infDefCas, infDefSize, attHits, defenseLandSize] = battleSim(infDefCas, infDefSize, attHits, rowB, defenseLandSize);
-
-[artDefCas, artDefSize, attHits, defenseLandSize] = battleSim(artDefCas, artDefSize, attHits, rowB, defenseLandSize);
-
-[tankDefCas, tankDefSize, attHits, defenseLandSize] = battleSim(tankDefCas, tankDefSize, attHits, rowB, defenseLandSize);
-
-[fightDefCas, fightDefSize, attHits, defenseLandSize] = battleSim(fightDefCas, fightDefSize, attHits, rowB, defenseLandSize);
-
-[bombDefCas, bombDefSize, attHits, defenseLandSize] = battleSim(bombDefCas, bombDefSize, attHits, rowB, defenseLandSize);
-
-
-[infAttCas, infAttSize, defHits, attackLandSize] = battleSim(infAttCas, infAttSize, defHits, rowA, attackLandSize);
-
-[artAttCas, artAttSize, defHits, attackLandSize] = battleSim(artAttCas, artAttSize, defHits, rowA, attackLandSize);
-
-[tankAttCas, tankAttSize, defHits, attackLandSize] = battleSim(tankAttCas, tankAttSize, defHits, rowA, attackLandSize);
-
-[fightAttCas, fightAttSize, defHits, attackLandSize] = battleSim(fightAttCas, fightAttSize, defHits, rowA, attackLandSize);
-
-[bombAttCas, bombAttSize, defHits, attackLandSize] = battleSim(bombAttCas, bombAttSize, defHits, rowA, attackLandSize);
-
-}
-
-round += 1;
-}
-
-totalAttCasualties = infAttCas + artAttCas + tankAttCas + fightAttCas + bombAttCas;
-totalDefCasualties = infDefCas + artDefCas + tankDefCas + fightDefCas + bombDefCas;
-
-const roangA = tbodyA.insertRow();
-const roangB = tbodyB.insertRow();
-
-addHeader("", "", "Total", "Casualties", "", "", roangA, "yes");
-
-addHeader("", "", "Total", "Casualties", "", "", roangB, "yes");
-
-if (selectedOption == "MilitaristicLand") {
-  addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
-  addCellsLoop("Total:", bombDefCas, infDefCas, artDefCas, tankDefCas, fightDefCas, tbodyB);
-}
-
-if(selectedOption == "EconomicalLand") {
-  addCellsLoop("Total:", infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas, tbodyA);
-  addCellsLoop("Total:", infDefCas, artDefCas, tankDefCas, fightDefCas, bombDefCas, tbodyB);
-}
-	
-const rowRTA = tbodyA.insertRow();
-const rowRTD = tbodyB.insertRow();
-
-addHeader("", "", "Remaining", "Troops","", "", rowRTA, "yes");
-addHeader("", "", "Remaining", "Troops","", "", rowRTD, "yes");
-
-if (selectedOption == "MilitaristicLand") {
-  addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
-  addCellsLoop("Total:", bombDefSize,infDefSize, artDefSize, tankDefSize, fightDefSize, tbodyB);
-}
-
-if(selectedOption == "EconomicalLand") {
-  addCellsLoop("Total:", infAttSize, artAttSize, tankAttSize, fightAttSize, bombAttSize, tbodyA);
-  addCellsLoop("Total:", infDefSize, artDefSize, tankDefSize, fightDefSize, bombDefSize, tbodyB);
-}
-
-const rowHA = tbodyA.insertRow();
-const rowHD = tbodyB.insertRow();
-
-addHeader("", "", "IPC", "Loss","", "", rowHA, "yes");
-addHeader("", "", "IPC", "Loss","", "", rowHD, "yes");
-
-const rowIPCRA = tbodyA.insertRow();
-const rowIPCRD = tbodyB.insertRow();
-
-var attIPCLoss = findIPCLoss(infAttCas, artAttCas, tankAttCas, fightAttCas, bombAttCas);
-var defIPCLoss = findIPCLoss(infDefCas, artDefCas, tankDefCas, fightDefCas, bombDefCas);
-
-addCellsLoop("Total:", attIPCLoss, "", "", "", "", tbodyA);
-
-addCellsLoop("Total:", defIPCLoss, "", "", "", "", tbodyB);
-
-generateChart("land");
-
-});
-
-});
-
-
-window.addEventListener('load', function() {
-const calcSeaButton = document.getElementById('calcSeaButton');
-
-calcSeaButton.addEventListener('click', function() {
-var transAttSize = parseInt(document.getElementById("offTransCountS").value);
-var subAttSize = parseInt(document.getElementById("offSubCountS").value);
-var destAttSize = parseInt(document.getElementById("offDestCountS").value);
-var airCAttSize = parseInt(document.getElementById("offAirCCountS").value);
-var battAttSize = parseInt(document.getElementById("offBattCountS").value);
-var fightAttSeaSize = parseInt(document.getElementById("offFightCountS").value);
-var bombAttSeaSize = parseInt(document.getElementById("offBombCountS").value);
-var battAttSubSize = battAttSize;
-
-var attackSeaSize = transAttSize + subAttSize + destAttSize + airCAttSize + battAttSize + fightAttSeaSize + bombAttSeaSize;
-
-var transDefSize = parseInt(document.getElementById("defTransCountS").value);
-var subDefSize = parseInt(document.getElementById("defSubCountS").value);
-var destDefSize = parseInt(document.getElementById("defDestCountS").value);
-var airCDefSize = parseInt(document.getElementById("defAirCCountS").value);
-var battDefSize = parseInt(document.getElementById("defBattCountS").value);
-var fightDefSeaSize = parseInt(document.getElementById("defFightCountS").value);
-var battDefSubSize = battDefSize;
-
-var defenseSeaSize = transDefSize + subDefSize + destDefSize + airCDefSize + battDefSize + fightDefSeaSize;
-
-winPercentageSeaSimulator(attackSeaSize, defenseSeaSize, transAttSize, subAttSize, destAttSize, airCAttSize, battAttSize, fightAttSeaSize, bombAttSeaSize, transDefSize, subDefSize, destDefSize, airCDefSize, battDefSize, fightDefSeaSize);
-
-transAttCas = 0; subAttCas = 0; destAttCas = 0; airCAttCas = 0; battAttCas = 0; fightAttSeaCas = 0; bombAttSeaCas = 0; battAttSubCas = 0;
-
-transDefCas = 0; subDefCas = 0; destDefCas = 0; airCDefCas = 0; battDefCas = 0; fightDefSeaCas = 0; battDefSubCas = 0;
-
-var round = 1;
-
-var attSeaHits;
-var defSeaHits;
-
-const tableA = document.getElementById('casAttSeaTable');
-const tableB = document.getElementById('casDefSeaTable');
-
-let tbodyA = tableA.getElementsByTagName('tbody')[0];
-if (tbodyA) {
-    tbodyA.remove();
-}
-
-let tbodyB = tableB.getElementsByTagName('tbody')[0];
-if (tbodyB) {
-    tbodyB.remove();
-}
-
-tbodyA = document.createElement('tbody');
-tbodyB = document.createElement('tbody');
-
-tableA.appendChild(tbodyA);
-tableB.appendChild(tbodyB);
-
-const rowBA = tbodyA.insertRow();
-const rowBD = tbodyB.insertRow();
-
-const dropdownSea = document.getElementById("combatStyleSea"); 
-const selectedOption = dropdownSea.value;
-
-if (selectedOption == "MilitaristicSea") {
-
-addSeaHeader("Round", "Transport", "A. Carriers", "Subs", "Fighters", "Destroyers", "Bombers", "Battleships", rowBA, "yes");
-addSeaHeader("Round", "Transport", "Subs", "Destroyers", "A. Carriers", "Fighters", "Battleships", "no", rowBD, "yes");
-}
-
-if (selectedOption == "EconomicalSea") {
-
-addSeaHeader("Round", "Transport", "Subs", "Fighters", "Destroyers", "Bombers", "A. Carriers", "Battleships", rowBA, "yes");
-addSeaHeader("Round", "Transport", "Subs", "Destroyers", "Fighters", "A. Carriers", "Battleships", "no", rowBD, "yes");
-}
-
-while (attackSeaSize > 0 && defenseSeaSize > 0) {
-
-if (round == 10 || (attackSeaSize < 0.01 || defenseSeaSize < 0.01)) {
-	break;
-}
-   
-attSeaHits = countAttSeaHits(subAttSize, destAttSize, airCAttSize, battAttSize, fightAttSeaSize, bombAttSeaSize); 
-defSeaHits = countDefSeaHits(transDefSize, subDefSize, destDefSize, airCDefSize, battDefSize, fightDefSeaSize); 
-
-const rowA = tbodyA.insertRow();
-const rowB = tbodyB.insertRow();
-
-const cell1A = rowA.insertCell();
-cell1A.textContent = round;
-
-const cell1B = rowB.insertCell();
-cell1B.textContent = round;
-
-
-if (selectedOption == "MilitaristicSea") {
-[battDefSubCas, battDefSubSize, attSeaHits, defenseSeaSize] = battleSim(battDefSubCas, battDefSubSize, attSeaHits, "battSim", defenseSeaSize);
-
-[transDefCas, transDefSize, attSeaHits, defenseSeaSize] = battleSim(transDefCas, transDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[subDefCas, subDefSize, attSeaHits, defenseSeaSize] = battleSim(subDefCas, subDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[destDefCas, destDefSize, attSeaHits, defenseSeaSize] = battleSim(destDefCas, destDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[airCDefCas, airCDefSize, attSeaHits, defenseSeaSize] = battleSim(airCDefCas, airCDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[fightDefSeaCas, fightDefSeaSize, attSeaHits, defenseSeaSize] = battleSim(fightDefSeaCas, fightDefSeaSize, attSeaHits, rowB, defenseSeaSize);
-
-[battDefCas, battDefSize, attSeaHits, defenseSeaSize] = battleSim(battDefCas, battDefSize, attSeaHits, rowB, defenseSeaSize);
-
-
-[battAttSubCas, battAttSubSize, defSeaHits, attackSeaSize] = battleSim(battAttSubCas, battAttSubSize, defSeaHits, "battSim", attackSeaSize);
-
-[transAttCas, transAttSize, defSeaHits, attackSeaSize] = battleSim(transAttCas, transAttSize, defSeaHits, rowA, attackSeaSize);
-
-[airCAttCas, airCAttSize, defSeaHits, attackSeaSize] = battleSim(airCAttCas, airCAttSize, defSeaHits, rowA, attackSeaSize);
-
-[subAttCas, subAttSize, defSeaHits, attackSeaSize] = battleSim(subAttCas, subAttSize, defSeaHits, rowA, attackSeaSize);
-
-[fightAttSeaCas, fightAttSeaSize, defSeaHits, attackSeaSize] = battleSim(fightAttSeaCas, fightAttSeaSize, defSeaHits, rowA, attackSeaSize);
-
-[destAttCas, destAttSize, defSeaHits, attackSeaSize] = battleSim(destAttCas, destAttSize, defSeaHits, rowA, attackSeaSize);
-
-[bombAttSeaCas, bombAttSeaSize, defSeaHits, attackSeaSize] = battleSim(bombAttSeaCas, bombAttSeaSize, defSeaHits, rowA, attackSeaSize);
-
-[battAttCas, battAttSize, defSeaHits, attackSeaSize] = battleSim(battAttCas, battAttSize, defSeaHits, rowA, attackSeaSize);
-}
-
-else if (selectedOption == "EconomicalSea") {
-[battDefSubCas, battDefSubSize, attSeaHits, defenseSeaSize] = battleSim(battDefSubCas, battDefSubSize, attSeaHits, "battSim", defenseSeaSize);
-
-[transDefCas, transDefSize, attSeaHits, defenseSeaSize] = battleSim(transDefCas, transDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[subDefCas, subDefSize, attSeaHits, defenseSeaSize] = battleSim(subDefCas, subDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[destDefCas, destDefSize, attSeaHits, defenseSeaSize] = battleSim(destDefCas, destDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[fightDefSeaCas, fightDefSeaSize, attSeaHits, defenseSeaSize] = battleSim(fightDefSeaCas, fightDefSeaSize, attSeaHits, rowB, defenseSeaSize);
-
-[airCDefCas, airCDefSize, attSeaHits, defenseSeaSize] = battleSim(airCDefCas, airCDefSize, attSeaHits, rowB, defenseSeaSize);
-
-[battDefCas, battDefSize, attSeaHits, defenseSeaSize] = battleSim(battDefCas, battDefSize, attSeaHits, rowB, defenseSeaSize);
-
-
-[battAttSubCas, battAttSubSize, defSeaHits, attackSeaSize] = battleSim(battAttSubCas, battAttSubSize, defSeaHits, "battSim", attackSeaSize);
-
-[transAttCas, transAttSize, defSeaHits, attackSeaSize] = battleSim(transAttCas, transAttSize, defSeaHits, rowA, attackSeaSize);
-
-[subAttCas, subAttSize, defSeaHits, attackSeaSize] = battleSim(subAttCas, subAttSize, defSeaHits, rowA, attackSeaSize);
-
-[fightAttSeaCas, fightAttSeaSize, defSeaHits, attackSeaSize] = battleSim(fightAttSeaCas, fightAttSeaSize, defSeaHits, rowA, attackSeaSize);
-
-[destAttCas, destAttSize, defSeaHits, attackSeaSize] = battleSim(destAttCas, destAttSize, defSeaHits, rowA, attackSeaSize);
-
-[bombAttSeaCas, bombAttSeaSize, defSeaHits, attackSeaSize] = battleSim(bombAttSeaCas, bombAttSeaSize, defSeaHits, rowA, attackSeaSize);
-
-[airCAttCas, airCAttSize, defSeaHits, attackSeaSize] = battleSim(airCAttCas, airCAttSize, defSeaHits, rowA, attackSeaSize);
-
-[battAttCas, battAttSize, defSeaHits, attackSeaSize] = battleSim(battAttCas, battAttSize, defSeaHits, rowA, attackSeaSize);
-
-}
-
-round += 1;
-}
-
-totalAttSeaCasualties = transAttCas + subAttCas + destAttCas + airCAttCas + battAttCas + fightAttSeaCas + bombAttSeaCas;
-
-totalDefSeaCasualties = transDefCas + subDefCas + destDefCas + airCDefCas + battDefCas + fightDefSeaCas;
-
-const roangA = tbodyA.insertRow();
-const roangB = tbodyB.insertRow();
-
-addSeaHeader("", "", "", "Total", "Casualties", "", "", "", roangA, "yes");
-
-addSeaHeader("", "", "", "Total", "Casualties", "", "", "no", roangB, "yes");
-
-addCellsSeaLoop("Total:", transAttCas, airCAttCas, subAttCas, fightAttSeaCas, destAttCas, bombAttSeaCas, battAttCas, tbodyA);
-
-addCellsSeaLoop("Total:", transDefCas, subDefCas, destDefCas, airCDefCas, fightDefSeaCas, battDefCas, "no", tbodyB);
-	
-const rowRTA = tbodyA.insertRow();
-const rowRTD = tbodyB.insertRow();
-
-addSeaHeader("", "", "", "Remaining", "Troops","", "", "", rowRTA, "yes");
-addSeaHeader("", "", "", "Remaining", "Troops","", "", "no", rowRTD, "yes");
-
-addCellsSeaLoop("Total:", transAttSize, airCAttSize, subAttSize, fightAttSeaSize, destAttSize, bombAttSeaSize, battAttSize, tbodyA);
-
-addCellsSeaLoop("Total:", transDefSize, subDefSize, destDefSize, airCDefSize, fightDefSeaSize, battDefSize, "no", tbodyB);
-
-const rowHA = tbodyA.insertRow();
-const rowHD = tbodyB.insertRow();
-
-addSeaHeader("", "", "", "IPC", "Loss","", "", "", rowHA, "yes");
-addSeaHeader("", "", "", "IPC", "Loss","", "", "no", rowHD, "yes");
-
-const rowIPCRA = tbodyA.insertRow();
-const rowIPCRD = tbodyB.insertRow();
-
-var attIPCSeaLoss = findIPCSeaLoss(transAttCas, subAttCas, destAttCas, airCAttCas, battAttCas, fightAttSeaCas, bombAttSeaCas);
-var defIPCSeaLoss = findIPCSeaLoss(transDefCas, subDefCas, destDefCas, airCDefCas, battDefCas, fightDefSeaCas, 0);
-
-addCellsSeaLoop("Total:", "", "", attIPCSeaLoss, "", "", "", "", tbodyA);
-
-addCellsSeaLoop("Total:", "", "", defIPCSeaLoss, "", "", "", "no", tbodyB);
-
-generateChart("sea");
-});
-});
-
-</script>
-
-<br>
 
 </body>
 </html>
