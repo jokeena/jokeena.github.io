@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>John Keena — games &amp; tools</title>
-  <meta name="description" content="John Keena builds tools for the games he plays in real life — an Axis & Allies combat calculator, a cribbage board, and Clarke Solitaire.">
+  <meta name="description" content="John Keena builds tools for the games he plays in real life — family pinochle, an Axis & Allies combat calculator, a cribbage board, and Clarke Solitaire.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
   <meta property="og:title" content="John Keena — games &amp; tools">
   <meta property="og:description" content="Tools for the games I play in real life.">
@@ -190,6 +190,39 @@
       overflow: hidden;
       position: relative;
     }
+
+    /* ---------- Art: pinochle table ---------- */
+
+    .pin-felt {
+      width: 76%;
+      aspect-ratio: 2 / 1.2;
+      border-radius: 50% / 44%;
+      background: radial-gradient(ellipse at 50% 35%, #4e9c58, #35773f 62%, #2a6435);
+      border: 6px solid #b08d5f;
+      box-shadow:
+        0 0 0 2px #8f6f45,
+        0 4px 12px rgba(40, 35, 25, 0.24),
+        inset 0 0 28px rgba(0, 40, 10, 0.42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .pin-felt::after {
+      content: "";
+      position: absolute;
+      inset: 9px 14px;
+      border-radius: inherit;
+      border: 1.5px solid rgba(255, 255, 255, 0.17);
+      pointer-events: none;
+    }
+
+    /* the namesake pair: queen of spades, jack of diamonds */
+    .pin-pair { display: flex; position: relative; }
+    .pin-pair .mcard { transform-origin: 50% 120%; }
+    .pin-pair .mcard:first-child { transform: rotate(-11deg) translateX(7px); }
+    .pin-pair .mcard:last-child { transform: rotate(10deg) translateX(-7px); }
 
     /* ---------- Art: infantryman ---------- */
 
@@ -377,6 +410,31 @@
 
     <section class="projects-list">
       <span class="section-label">Projects</span>
+
+      <article class="project">
+        <div class="art art-pin" aria-hidden="true">
+          <div class="pin-felt">
+            <div class="pin-pair">
+              <span class="mcard black" data-rank="Q" data-suit="&spades;"></span>
+              <span class="mcard red" data-rank="J" data-suit="&diams;"></span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2><a href="https://jokeena.github.io/pinochle/" target="_blank" rel="noopener">Pinochle</a></h2>
+          <p class="meta">TypeScript &middot; React &middot; 3&ndash;6 players</p>
+          <p>
+            My family&rsquo;s house-rules pinochle, playable solo against bots that bid, pass, and
+            defend by the table&rsquo;s own conventions. Six variants from three to six handed,
+            with kitties, passing, and meld scored the way we actually play. Add it to your home
+            screen and it plays like an app.
+          </p>
+          <div class="project-links">
+            <a href="https://jokeena.github.io/pinochle/" target="_blank" rel="noopener">Launch &nearr;</a>
+            <a class="src" href="https://github.com/jokeena/pinochle" target="_blank" rel="noopener">Source</a>
+          </div>
+        </div>
+      </article>
 
       <article class="project">
         <div class="art art-aa" aria-hidden="true">
